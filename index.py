@@ -2,7 +2,6 @@ import tkinter as tk
 import hashlib
 import pandas as pd
 
-
 window = tk.Tk()
 window.title("Login form")
 window.geometry('340x440')
@@ -19,21 +18,15 @@ def login():
     hashPassword = hashlib.md5(password.encode())
 
     data = pd.read_csv("database.csv")
+    data = data.set_index(['username'])
 
-    if hashUsername.hexdigest() not in data:
-        print("This user does not exist. Please create a new account or try again")
-        keepGoing = 1
+    user = data.loc[hashUsername.hexdigest()]
+    pw = user.password
 
-    while keepGoing == 0:
-        # searches for the user
-        data = data.set_index(['username'])
-        user = data.loc[hashUsername.hexdigest()]
-        pw = user.password
-
-        if hashPassword.hexdigest() == pw:
-            print("Success")
-        else:
-            print("ERROR INVALID CREDENTIALS")
+    if hashPassword.hexdigest() == pw:
+        print("Success")
+    else:
+        print("ERROR INVALID CREDENTIALS")
 
 
 # Creating the widgets
