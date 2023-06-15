@@ -20,14 +20,16 @@ def login():
     data = pd.read_csv("database.csv")
     data = data.set_index(['username'])
 
-    user = data.loc[hashUsername.hexdigest()]
-    pw = user.password
+    try:
+        user = data.loc[hashUsername.hexdigest()]
+        pw = user.password
+        if hashPassword.hexdigest() == pw:
+            print("Successfully logged in")
+        else:
+            print("Incorrect Password. Try again or create a new account.")
 
-    if hashPassword.hexdigest() == pw:
-        print("Success")
-    else:
-        print("ERROR INVALID CREDENTIALS")
-
+    except:
+        print("An account with that username does not exist. Please try again or create an account")
 
 # Creating the widgets
 loginLabel = tk.Label(frame, text="Login", bg="#333333", fg="#FFFFFF", font=("Arial", 30))
