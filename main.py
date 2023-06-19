@@ -1,19 +1,10 @@
+from createLogin import createAccount
 from globals import *
-from loggedIn import *
-
-window.title("Login form")
-window.geometry('350x440')
-window.configure(bg='#333333')
-frame = tk.Frame(bg='#333333')
+from logon import windowTwo
 
 
-def login():
-    keepGoing = 0
-    loggedIn = False
-    username = usernameEntry.get()
+def login(frame, username, password):
     hashUsername = hashlib.md5(username.encode())
-
-    password = passwordEntry.get()
     hashPassword = hashlib.md5(password.encode())
 
     data = pd.read_csv("database.csv")
@@ -23,37 +14,52 @@ def login():
         user = data.loc[hashUsername.hexdigest()]
         pw = user.password
         if hashPassword.hexdigest() == pw:
-            loggedIn = True
+            windowTwo()
+            for widget in frame.winfo_children():
+                widget.destroy()
+            Label(frame, pady=60, bg="#333333").pack()
+            Label(frame, text="Successfully \nlogged in!", font=("Arial", 40), bg="#333333", fg="#FFFFFF").pack()
 
         else:
-            print("Incorrect Password. Try again or create a new account.")
+            messagebox.showerror("Incorrect Password", "The password for the account you entered is Incorrect. "
+                                                       "\nPlease try again or create a new password.")
 
     except:
-        print("An account with that username does not exist. Please try again or create an account")
-
-    if loggedIn == True:
-        windowTwo()
-        for widget in frame.winfo_children():
-            widget.destroy()
-        Label(frame, pady=60, bg="#333333").pack()
-        Label(frame, text="Successfully \nlogged in!", font=("Arial", 40), bg="#333333", fg="#FFFFFF").pack()
+        messagebox.showerror("No Account Found", "The username and password entered does not correspond to an existing "
+                                                 "account.\n\nPlease try again or create a new account")
 
 
-# Creating the widgets main screen
-loginLabel = tk.Label(frame, text="Login", bg="#333333", fg="#FFFFFF", font=("Arial", 30))
-usernameLabel = tk.Label(frame, text="Username", bg="#333333", fg="#FFFFFF", font=("Arial", 16))
-usernameEntry = tk.Entry(frame, font=("Arial", 14))
-passwordEntry = tk.Entry(frame, show="*", font=("Arial", 14))
-passwordLabel = tk.Label(frame, text="Password", bg="#333333", fg="#FFFFFF", font=("Arial", 16))
-loginButton = tk.Button(frame, text="Login", bg="#FFFFFF", fg="#333333", font=("Arial", 16), command=login)
+def createPage():
+    window = tk.Tk()
+    window.title("Login form")
+    window.geometry('350x440')
+    window.configure(bg='#333333')
+    window.resizable(False, False)
+    frame = tk.Frame(bg='#333333')
 
-# Placing the widgets on the screen
-loginLabel.grid(row=0, column=0, columnspan=2, sticky="news", pady=40)
-usernameLabel.grid(row=1, column=0, padx=5)
-usernameEntry.grid(row=1, column=1, pady=20)
-passwordLabel.grid(row=2, column=0, padx=5)
-passwordEntry.grid(row=2, column=1, pady=20)
-loginButton.grid(row=3, column=0, columnspan=2, pady=30)
+    # Creating the widgets main screen
+    loginLabel = tk.Label(frame, text="Login", bg="#333333", fg="#FFFFFF", font=("Arial", 30))
+    usernameLabel = tk.Label(frame, text="Username", bg="#333333", fg="#FFFFFF", font=("Arial", 16))
+    usernameEntry = tk.Entry(frame, font=("Arial", 14))
+    passwordEntry = tk.Entry(frame, show="*", font=("Arial", 14))
+    passwordLabel = tk.Label(frame, text="Password", bg="#333333", fg="#FFFFFF", font=("Arial", 16))
+    loginButton = tk.Button(frame, text="Login", bg="#FFFFFF", fg="#333333", font=("Arial", 16),
+                            command=lambda: login(frame, usernameEntry.get(), passwordEntry.get()),
+                            activebackground='#5D3FD3', activeforeground="#FFFFFF")
 
-frame.pack()
-window.mainloop()
+    createAccountButton = tk.Button(frame, text="Create Account", bg="#333333", fg="#FFFFFF", font=("Arial", 10),
+                                    command=createAccount, activebackground='#5D3FD3', activeforeground="#FFFFFF")
+
+    # Placing the widgets on the screen
+    loginLabel.grid(row=0, column=0, columnspan=2, sticky="news", pady=40)
+    usernameLabel.grid(row=1, column=0, padx=5)
+    usernameEntry.grid(row=1, column=1, pady=20)
+    passwordLabel.grid(row=2, column=0, padx=5)
+    passwordEntry.grid(row=2, column=1, pady=20)
+    loginButton.grid(row=3, column=0, columnspan=2, pady=30)
+    createAccountButton.grid(row=4, column=0, columnspan=2, pady=10)
+    frame.pack()
+    window.mainloop()
+
+
+createPage()
